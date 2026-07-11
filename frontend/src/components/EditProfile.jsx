@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function EditProfile({ user, setUser, onClose }) {
   const [form, setForm] = useState({
@@ -33,14 +34,15 @@ function EditProfile({ user, setUser, onClose }) {
       );
 
       setUser(res.data);
-
-      alert("Profile Updated Successfully ✅");
+      toast.success("Profile Updated Successfully 🎉");
 
       onClose();
 
     } catch (error) {
 
-      alert(error.response?.data?.message || "Something went wrong");
+     toast.error(
+      error.response?.data?.message || "Something went wrong"
+     );
 
     } finally {
 

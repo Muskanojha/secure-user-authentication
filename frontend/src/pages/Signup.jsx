@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Signup() {
   const [form, setForm] = useState({
@@ -9,21 +10,20 @@ function Signup() {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      navigate("/dashboard");
-    }
-  }, [navigate]);
-
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
 
     try {
       await axios.post(
@@ -31,44 +31,57 @@ function Signup() {
         form
       );
 
-      navigate("/login");
+      toast.success("Account Created Successfully 🎉");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+
     } catch (error) {
-      alert(error.response?.data?.message || "Signup Failed");
+
+      toast.error(
+        error.response?.data?.message || "Signup Failed"
+      );
+
+    } finally {
+
+      setLoading(false);
+
     }
   };
 
   return (
-    <div className="auth-container">
-      <form onSubmit={handleSubmit}>
-        <h2>Signup</h2>
+    <form onSubmit={handleSubmit}>
+      <h2>Signup</h2>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          onChange={handleChange}
-          required
-        />
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        onChange={handleChange}
+        required
+      />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-          required
-        />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        onChange={handleChange}
+        required
+      />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-          required
-        />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        onChange={handleChange}
+        required
+      />
 
-        <button type="submit">Signup</button>
-      </form>
-    </div>
+      <button type="submit" disabled={loading}>
+        {loading ? "Creating..." : "Signup"}
+      </button>
+    </form>
   );
 }
 
